@@ -19,12 +19,12 @@ fn main() {
             i += 1;
         }
     }
+    left.sort_unstable();
+    right.sort_unstable();
     let elapsed_parsing = now.elapsed();
 
     //done with parsing, can start solving part 1
     let now = Instant::now();
-    left.sort();
-    right.sort();
     i = 0;
     let mut part1 = 0;
     while i < left.len() && i < right.len() {
