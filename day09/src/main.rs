@@ -74,11 +74,9 @@ fn main() {
     for to_move in (0..=big).rev() {
         let mut first_free = 0;
 
-        // Trova il primo spazio libero contiguo che può contenere il file
         while first_free + size[to_move] <= loc[to_move] {
             let mut free_space = 0;
 
-            // Calcola lo spazio libero contiguo a partire da `first_free`
             while first_free + free_space < blocks.len()
                 && blocks[first_free + free_space].is_none()
             {
@@ -88,26 +86,23 @@ fn main() {
                 }
             }
 
-            // Se lo spazio contiguo è sufficiente, esci dal ciclo
             if free_space >= size[to_move] {
                 break;
             }
 
-            // Avanza per trovare un nuovo spazio libero
             first_free += free_space + 1;
         }
 
-        // Se non c'è spazio sufficiente a sinistra, salta il file
         if first_free + size[to_move] > loc[to_move] || first_free + size[to_move] > blocks.len() {
             continue;
         }
 
-        // Sposta il file nel nuovo spazio libero
         for idx in 0..size[to_move] {
             blocks[first_free + idx] = Some(to_move as i32);
             blocks[loc[to_move] + idx] = None;
         }
     }
+
     let part2: i64 = blocks
         .iter()
         .enumerate()
