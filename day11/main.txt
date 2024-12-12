@@ -1,0 +1,101 @@
+use std::fs;
+use std::time::Instant;
+
+fn main() {
+    let contents = fs::read_to_string("input.txt").expect("Error while reading file");
+    let now = Instant::now();
+
+    //start parsing
+    let mut nums: Vec<i64> = contents
+        .split_whitespace()
+        .map(|num| num.parse::<i64>().expect("Error while parsing"))
+        .collect();
+    let mut nums2 = nums.clone();
+    let elapsed_parsing = now.elapsed();
+
+    //done with parsing, can start solving part 1
+    let now = Instant::now();
+
+    for _cnt in 0..25 {
+        let mut i = 0;
+        while i < nums.len() {
+            if nums[i] == 0 {
+                nums[i] = 1;
+                i += 1;
+                continue;
+            }
+
+            let digits = get_digits(nums[i]);
+            if digits.len() % 2 == 0 {
+                let mid = digits.len() / 2;
+                let left = combine_digits(&digits[0..mid]);
+                let right = combine_digits(&digits[mid..]);
+
+                nums[i] = left;
+                nums.insert(i + 1, right);
+                i += 2;
+            } else {
+                nums[i] *= 2024;
+                i += 1;
+            }
+        }
+    }
+
+    let part1 = nums.len();
+    println!("{}", part1);
+    let elapsed_part1 = now.elapsed();
+
+    //done with part 1, can start solving part 2
+    let now = Instant::now();
+    let mut nums = nums2;
+
+    for _cnt in 0..75 {
+        let mut i = 0;
+        while i < nums.len() {
+            if nums[i] == 0 {
+                nums[i] = 1;
+                i += 1;
+                continue;
+            }
+
+            let digits = get_digits(nums[i]);
+            if digits.len() % 2 == 0 {
+                let mid = digits.len() / 2;
+                let left = combine_digits(&digits[0..mid]);
+                let right = combine_digits(&digits[mid..]);
+
+                nums[i] = left;
+                nums.insert(i + 1, right);
+                i += 2;
+            } else {
+                nums[i] *= 2024;
+                i += 1;
+            }
+        }
+    }
+
+    let part2 = nums.len();
+    println!("{}", part2);
+    let elapsed_part2 = now.elapsed();
+
+    println!("Time for parsing: {:.2?}", elapsed_parsing);
+    println!("Time for part 1: {:.2?}", elapsed_part1);
+    println!("Time for part 2: {:.2?}", elapsed_part2);
+}
+
+fn get_digits(mut num: i64) -> Vec<i64> {
+    let mut digits = Vec::new();
+    if num == 0 {
+        return vec![0];
+    }
+    while num > 0 {
+        digits.push(num % 10);
+        num /= 10;
+    }
+    digits.reverse();
+    digits
+}
+
+fn combine_digits(digits: &[i64]) -> i64 {
+    digits.iter().fold(0, |acc, &d| acc * 10 + d)
+}
