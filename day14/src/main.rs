@@ -160,7 +160,7 @@ fn save_grid_as_svg(robots: &[Robot], width: i32, height: i32, step: usize, outp
     // Add step number
     svg.push_str(&format!(
         r#"<text x="10" y="20" fill="black" font-family="Arial" font-size="16">Step: {}</text>"#,
-        step
+        step + 1
     ));
 
     // Close SVG tag
