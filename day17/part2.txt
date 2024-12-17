@@ -1,0 +1,27 @@
+Register A: 52884621
+Register B: 0
+Register C: 0
+
+Program: 2,4,1,3,7,5,4,7,0,3,1,5,5,5,3,0
+
+we need to do some reverse engineering.
+let's break down what the program is doing by examining the couples (opcode, operator):
+
+2,4 -> b = a % 8
+1,3 -> b = b ^ 3
+7,5 -> c = a >> b
+4,7 -> b = b ^ c
+0,3 -> a = a >> 3
+1,5 -> b = b ^ 5
+5,5 -> out(b)
+3,0 -> jnz(start)
+
+we can understand that during the last loop a becomes 0 after the a = a >> 3 instruction.
+this means that at the start of the loop 0 < a <= 7, otherwise a >> 3 would produce a result of 1 or greater.
+we also know that the last output of the program needs to be 0, and output = (a % 8) ^ 3 ^ c ^ 5. we need to see which value of a makes the output 0.
+
+after some calculations, output = (a % 8) ^ 3 ^ c ^ 5 = 0 when a = 5 during the last loop.
+this means that during the second to last loop the instruction a = a >> 3 needs to produce 5, so we can see that a in the previous loop 40 < a <= 47, since these are the only numbers that produce 5 when shifted three times to the right.
+we also know that the second to last output of the program needs to be 3, so we can repeat the calculations we did for the last loop for this loop.
+after we do the calculations we will know the range in which a needs to be during the third to last loop, and we can continue going backwards like this until we get to the first output, 2.
+having understood the mechanism we can now proceed to code a solution.
