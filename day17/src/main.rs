@@ -108,24 +108,24 @@ impl Machine {
             return Some(ans);
         }
 
-        if let Some(&last_value) = program.last() {
-            for t in 0..8 {
-                let a = (ans << 3) + t;
-                let mut b = t ^ 3;
-                let c = a >> b;
-                b ^= c;
-                b ^= 5;
+        let &last_value = program.last()?;
 
-                if b % 8 == last_value as u64 {
-                    let sub = self.find(&program[0..program.len() - 1], a);
-                    if sub.is_none() {
-                        continue;
-                    }
-                    return Some(sub)?;
+        for t in 0..8 {
+            let a = (ans << 3) + t;
+            //note well that the instructions following this line are different for each input,
+            //please refer to part2.txt for the explanation of why that is
+            let mut b = t ^ 3;
+            let c = a >> b;
+            b ^= c;
+            b ^= 5;
+
+            if b % 8 == last_value as u64 {
+                if let Some(sub) = self.find(&program[..program.len() - 1], a) {
+                    return Some(sub);
                 }
             }
         }
 
-        Some(ans)
+        None
     }
 }
