@@ -7,7 +7,6 @@ fn main() {
     let now = Instant::now();
 
     //start parsing
-    let mut grid: Vec<Vec<char>> = vec![vec!['.'; 71]; 71];
     let obstacles: Vec<(usize, usize)> = contents
         .lines()
         .filter_map(|line| {
@@ -23,24 +22,27 @@ fn main() {
 
     //done with parsing, can start solving part 1
     let now = Instant::now();
-    for (x, y) in obstacles.iter().take(1024) {
-        grid[*x][*y] = '#';
-    }
-
-    let part1 = bfs(&grid, (0, 0), (70, 70));
+    let part1 = bfs(&obstacles, 70, 1024);
     println!("{}", part1);
     let elapsed_part1 = now.elapsed();
 
     //done with part 1, can start solving part 2
     let now = Instant::now();
-    let mut i = 1024;
-    let mut part2 = (0, 0);
-    while bfs(&grid, (0, 0), (70, 70)) != -1 {
-        let (x, y) = (obstacles[i].0, obstacles[i].1);
-        grid[x][y] = '#';
-        i += 1;
-        part2 = (x, y);
+    let mut left = 0;
+    let mut right = obstacles.len() - 1;
+    let mut middle = (left + right) / 2;
+
+    while left < right {
+        //binary search (be wary of 1-off errors)
+        middle = (left + right) / 2;
+        if bfs(&obstacles, 70, middle + 1) != -1 {
+            left = middle + 1;
+        } else {
+            right = middle;
+        }
     }
+
+    let part2 = obstacles[middle];
     println!("{:?}", part2);
     let elapsed_part2 = now.elapsed();
 
@@ -53,18 +55,24 @@ fn in_grid(x: i32, y: i32, n: usize) -> bool {
     x >= 0 && x < n as i32 && y >= 0 && y < n as i32
 }
 
-fn bfs(grid: &[Vec<char>], start: (usize, usize), end: (usize, usize)) -> i32 {
+fn bfs(obstacles: &[(usize, usize)], end: usize, n_obstacles: usize) -> i32 {
+    let mut grid = vec![vec!['.'; end + 1]; end + 1];
+
+    for (x, y) in obstacles.iter().take(n_obstacles) {
+        grid[*x][*y] = '#';
+    }
+
     let n = grid.len();
     let directions = [(0, 1), (1, 0), (0, -1), (-1, 0)];
 
     let mut queue: VecDeque<(usize, usize, i32)> = VecDeque::new(); //queue for BFS
-    queue.push_back((start.0, start.1, 0)); //(row, col, steps)
+    queue.push_back((0, 0, 0)); //(row, col, steps)
 
     let mut visited = HashSet::new();
-    visited.insert(start);
+    visited.insert((0, 0));
 
     while let Some((x, y, steps)) = queue.pop_front() {
-        if (x, y) == end {
+        if (x, y) == (end, end) {
             return steps;
         }
 
