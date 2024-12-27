@@ -1,3 +1,3 @@
-wip
-temporary readme for advent of code 2024
-hopefully will be able to solve with rust
+🎄
+
+Will hopefully be back to implement the python solutions in rust. For now I'm quite happy with how things went, I learned a lot of new things and I am looking forward to learn even more next year. Merry Christmas!
